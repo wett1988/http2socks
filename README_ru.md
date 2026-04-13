@@ -1,6 +1,8 @@
 # http2socks
 
-Небольшой прокси-конвертер: принимает HTTP proxy-соединения локально и отправляет трафик через SOCKS5-сервер.
+Небольшой прокси-конвертер: принимает HTTP proxy-соединения локально и отправляет трафик через SOCKS5-сервер. 
+
+Программа кроссплатформенная и работает как под Linux, так и под Windows.
 
 Поддерживает:
 - обычные HTTP-запросы (например, `GET http://example.com/...`);
@@ -27,14 +29,23 @@
 ### Через `go run`
 
 ```bash
+# for Linux
 go run main.go -listen 127.0.0.1:8080 -socks 127.0.0.1:1080
+
+# for Windows
+GOOS=windows GOARCH=amd64 go run main.go -listen 127.0.0.1:8080 -socks 127.0.0.1:1080
 ```
 
 ### Сборка и запуск бинарника
 
 ```bash
+# for Linux
 go build -o http2socks main.go
 ./http2socks -listen 127.0.0.1:8080 -socks 127.0.0.1:1080
+
+# for Windows
+GOOS=windows GOARCH=amd64 go build -o http2socks.exe main.go
+./http2socks.exe -listen 127.0.0.1:8080 -socks 127.0.0.1:1080
 ```
 
 После запуска программа выводит:
