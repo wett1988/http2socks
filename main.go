@@ -196,13 +196,32 @@ func handleClient(client net.Conn, socks5Addr string, bypass, proxied []string) 
 		client.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
 		log.Printf("Tunnel: %s", target)
 	} else {
-		upstream.Write([]byte(method + " " + reqTarget + " " + proto + "\r\n" + strings.Join(headers, "")))
+		upstream.Write([]byte(method + " " + reqTarget + " " + proto + "\r\n" + strings.Join(filterProxyHeaders(headers), "")))
 		log.Printf("HTTP request: %s", target)
 	}
 
 	// Двусторонний обмен данными
 	go io.Copy(upstream, br)
 	io.Copy(client, upstream)
+}
+
+func filterProxyHeaders(headers []string) []string {
+	var filtered []string
+	for _, line := range headers {
+		switch headerName(line) {
+		case "proxy-authorization", "proxy-connection":
+			continue
+		}
+		filtered = append(filtered, line)
+	}
+	return filtered
+}
+
+func headerName(line string) string {
+	if i := strings.IndexByte(line, ':'); i >= 0 {
+		return strings.ToLower(strings.TrimSpace(line[:i]))
+	}
+	return ""
 }
 
 func parseBypass(s string) []string {
